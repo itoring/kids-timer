@@ -457,8 +457,10 @@ function drawTicksForRing(cx, cy, ringRadius) {
  /* ボタンの有効/無効（仕様） */
  function updateButtonsEnabled() {
    const enabled = {
-     edit: state.status === 'S0' || state.status === 'S2',
-     start: state.status === 'S0' || state.status === 'S2',
+//     edit: state.status === 'S0' || state.status === 'S2',
+//     start: state.status === 'S0' || state.status === 'S2',
+     edit: state.status !== 'S1',
+     start: state.status !== 'S1',
      stop: state.status === 'S1',
      reset: state.status !== 'S1' // 到達時はリセットのみ、S0/S2も可
    };
@@ -478,7 +480,8 @@ function drawTicksForRing(cx, cy, ringRadius) {
      els['btn-startstop'].disabled = false; // Stop可
    } else if (state.status === 'S3') {
      // 完了時：リセットのみ
-     els['btn-startstop'].disabled = true;
+//     els['btn-startstop'].disabled = true;
+     els['btn-startstop'].disabled = false;
    }
  
    els['btn-reset'].disabled = !enabled.reset;
