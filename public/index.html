@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="robots" content="noindex,nofollow" />
+    <title id="app-title">タイマー</title>
+
+    <!-- 高コントラスト想定のベースCSS -->
+    <link rel="stylesheet" href="./style.css" />
+
+    <!-- ES Module（外部依存なし） -->
+    <script type="module" src="./script.js" defer></script>
+  </head>
+  <body>
+    <div id="app" class="app">
+      <!-- ヘッダー：表記切替ボタン -->
+      <header id="app-header" class="app-header">
+        <h1 class="visually-hidden" id="app-title-h1">タイマー</h1>
+        <button
+          id="btn-lang-toggle"
+          class="btn btn-secondary"
+          aria-pressed="false"
+          aria-controls="app"
+          aria-live="off"
+          title="ひらがな表示に切り替え"
+        >
+          ひらがな
+        </button>
+      </header>
+
+      <!-- メイン：左=文字盤、右=操作パネル（モバイル縦は上下） -->
+      <main id="app-main" class="app-main">
+        <!-- 文字盤 -->
+        <section id="dial" class="dial" aria-labelledby="dial-label">
+          <h2 id="dial-label" class="visually-hidden">アナログ表示</h2>
+
+          <!-- SVG: 外側=分、内側=秒。12時起点・時計回り。円弧はドーナツ状の扇形 -->
+          <svg id="dial-svg" viewBox="0 0 240 240" role="img" aria-hidden="true">
+            <!-- 背景リング（外=分, 内=秒） -->
+            <circle id="ring-minutes" cx="120" cy="120" r="100" class="ring ring-min" />
+            <circle id="ring-seconds" cx="120" cy="120" r="70" class="ring ring-sec" />
+
+            <!-- 塗りつぶし扇形（ドーナツ） -->
+            <path id="arc-minutes" class="arc arc-min" d="" />
+            <path id="arc-seconds" class="arc arc-sec" d="" />
+
+            <!-- 目盛りラベル（0,10,20,30,40,50を外側に表示） -->
+            <g id="labels">
+              <!-- テキストはJSで座標計算して配置 -->
+            </g>
+          </svg>
+        </section>
+
+        <!-- 操作パネル -->
+        <section id="panel" class="panel" aria-labelledby="panel-label">
+          <h2 id="panel-label" class="visually-hidden">設定と操作</h2>
+
+          <!-- 分・秒ラベル -->
+          <div class="labels">
+            <span id="label-min" class="unit-label" aria-hidden="true">分</span>
+            <span id="label-sec" class="unit-label" aria-hidden="true">秒</span>
+          </div>
+
+          <!-- デジタル表示と上下ボタン（タップ領域44px以上） -->
+          <div class="digits">
+            <!-- 分：十の位 -->
+            <div class="digit-col">
+              <button id="btn-m-tens-up" class="btn btn-up" aria-label="分十の位を増やす">▲</button>
+              <div id="digit-m-tens" class="digit" role="status" aria-live="off" aria-label="分十の位">0</div>
+              <button id="btn-m-tens-down" class="btn btn-down" aria-label="分十の位を減らす">▼</button>
+            </div>
+            <!-- 分：一の位 -->
+            <div class="digit-col">
+              <button id="btn-m-ones-up" class="btn btn-up" aria-label="分一の位を増やす">▲</button>
+              <div id="digit-m-ones" class="digit" role="status" aria-live="off" aria-label="分一の位">0</div>
+              <button id="btn-m-ones-down" class="btn btn-down" aria-label="分一の位を減らす">▼</button>
+            </div>
+
+            <div class="colon" aria-hidden="true">:</div>
+
+            <!-- 秒：十の位 -->
+            <div class="digit-col">
+              <button id="btn-s-tens-up" class="btn btn-up" aria-label="秒十の位を増やす">▲</button>
+              <div id="digit-s-tens" class="digit" role="status" aria-live="off" aria-label="秒十の位">0</div>
+              <button id="btn-s-tens-down" class="btn btn-down" aria-label="秒十の位を減らす">▼</button>
+            </div>
+            <!-- 秒：一の位 -->
+            <div class="digit-col">
+              <button id="btn-s-ones-up" class="btn btn-up" aria-label="秒一の位を増やす">▲</button>
+              <div id="digit-s-ones" class="digit" role="status" aria-live="off" aria-label="秒一の位">0</div>
+              <button id="btn-s-ones-down" class="btn btn-down" aria-label="秒一の位を減らす">▼</button>
+            </div>
+          </div>
+
+          <!-- スタート/ストップ、リセット -->
+          <div class="controls">
+            <button id="btn-startstop" class="btn btn-primary" aria-pressed="false">スタート</button>
+            <button id="btn-reset" class="btn btn-secondary">リセット</button>
+          </div>
+
+          <!-- ライブリージョン（エラーメッセージ等） -->
+          <p id="live" class="live" aria-live="polite"></p>
+
+          <!-- 現在の合計時間をスクリーンリーダへ（視覚的には非表示） -->
+          <p id="sr-total" class="visually-hidden" aria-live="polite">現在の合計時間: 00:00</p>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,24 @@
+{
+    "name": "kids-timer-webapp",
+    "version": "1.0.0",
+    "description": "低学年向け アナログ＆デジタル タイマー Webアプリ（Node.js + Express 配信、フロントはプレーンHTML/CSS/JS/SVG、表記切替対応）",
+    "private": true,
+    "type": "module",
+    "scripts": {
+      "start": "node server.js"
+    },
+    "keywords": [
+      "timer",
+      "education",
+      "svg",
+      "accessibility",
+      "aria",
+      "hiragana"
+    ],
+    "author": "",
+    "license": "MIT",
+    "dependencies": {
+      "express": "^4.21.1"
+    }
+  }
+  
