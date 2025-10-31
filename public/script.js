@@ -34,6 +34,7 @@
    restoreLangMode();
    setupUITexts();
    layoutDialLabels();
+   layoutDialTicks();
    bindEvents();
    updateAllViews(); // 00:00描画
  });
@@ -122,14 +123,54 @@
    }
  }
  
+/* 文字盤に目盛りを入れる
+*/
+ function layoutDialTicks() {
+  const g = document.getElementById('ticks');
+  g.innerHTML = '';
+
+  const cx = 120, cy = 130;
+
+  drawTicksForRing(cx, cy, 100); // 外リング
+  drawTicksForRing(cx, cy, 60);  // 内リング
+}
+
+/* 実際にメモリを描画する
+*/
+function drawTicksForRing(cx, cy, ringRadius) {
+  const g = document.getElementById('ticks');
+
+  // リングから内側に10px入った場所まで線を描く
+  const rTickEnd = ringRadius - 2.5;
+  const rTickStart = rTickEnd - 5; // 線の長さ 8px（調整OK）
+
+  const labels = [0, 10, 20, 30, 40, 50];
+  labels.forEach((_, i) => {
+    const deg = -90 + i * 60;
+    const rad = deg * Math.PI / 180;
+
+    const x1 = cx + rTickStart * Math.cos(rad);
+    const y1 = cy + rTickStart * Math.sin(rad);
+    const x2 = cx + rTickEnd * Math.cos(rad);
+    const y2 = cy + rTickEnd * Math.sin(rad);
+
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("x1", x1);
+    line.setAttribute("y1", y1);
+    line.setAttribute("x2", x2);
+    line.setAttribute("y2", y2);
+    g.appendChild(line);
+  });
+}
+
  /* 文字盤のラベル（0,10,20,30,40,50）を配置
     - 12時起点（0）から時計回りに60度刻み
  */
  function layoutDialLabels() {
    const g = document.getElementById('labels');
    g.innerHTML = '';
-   const cx = 120, cy = 120;
-   const r = 112; // 外周より少し外に出すと読みやすい
+   const cx = 120, cy = 130;
+   const r = 120; // 外周より少し外に出すと読みやすい
    const labels = [0, 10, 20, 30, 40, 50];
    labels.forEach((val, i) => {
      const deg = -90 + i * 60; // 12時起点
@@ -445,16 +486,19 @@
  
  /* ライブリージョンへ辞書メッセージ */
  function speak(keyPath) {
-   if (!keyPath) {
+/*
+  if (!keyPath) {
      els['live'].textContent = '';
      return;
    }
    els['live'].textContent = t(keyPath);
- }
+*/
+   }
  
  /* 無効操作時の視覚フィードバック */
  function flashDigits() {
-   const boxes = [
+/*
+  const boxes = [
      'digit-m-tens','digit-m-ones','digit-s-tens','digit-s-ones'
    ].map(id => els[id]);
    boxes.forEach(el => {
@@ -463,7 +507,8 @@
      void el.offsetWidth;
      el.classList.add('flash');
    });
- }
+*/
+   }
  
  /* 画面全体更新（数字・ダイヤル・SRラベル） */
  function updateAllViews() {
@@ -478,8 +523,8 @@
    const degMin = Math.min(360, m * 6);
    const degSec = Math.min(360, s * 6);
  
-   els['arc-minutes'].setAttribute('d', donutPath(120, 120, 112, 88, degMin));
-   els['arc-seconds'].setAttribute('d', donutPath(120, 120, 82, 58, degSec));
+   els['arc-minutes'].setAttribute('d', donutPath(120, 130, 97, 62, degMin));
+   els['arc-seconds'].setAttribute('d', donutPath(120, 130, 57, 30, degSec));
  
    // SR向け合計時間
    const mm = String(m).padStart(2, '0');
@@ -495,39 +540,68 @@
  /* ========== SVGドーナツ扇形：12時起点・時計回り ========== */
  /**
   * donutPath(cx, cy, rOuter, rInner, angleDeg)
-  * 角度0で何も描かない。0<angle<360 はドーナツ扇形。360は全周に近い形を描く。
+  * 角度0で何も描かない。0<angle<360 はドーナツ扇形。360は180度のドーナツ扇形２つで表現する。
   */
- function donutPath(cx, cy, rOuter, rInner, angleDeg) {
-   const a = Math.max(0, Math.min(360, angleDeg));
-   if (a === 0) return '';
- 
-   // 12時起点（-90度）から時計回りに a 度
-   const startA = (-90 * Math.PI) / 180;
-   const endA = ((-90 + a) * Math.PI) / 180;
- 
-   const x0 = cx + rOuter * Math.cos(startA);
-   const y0 = cy + rOuter * Math.sin(startA);
-   const x1 = cx + rOuter * Math.cos(endA);
-   const y1 = cy + rOuter * Math.sin(endA);
- 
-   const xi0 = cx + rInner * Math.cos(endA);
-   const yi0 = cy + rInner * Math.sin(endA);
-   const xi1 = cx + rInner * Math.cos(startA);
-   const yi1 = cy + rInner * Math.sin(startA);
- 
-   const largeArc = a > 180 ? 1 : 0;
- 
-   // パスは塗りつぶし不要のため stroke を使用する設計だったが
-   // 扇形として視覚的に太い帯を見せたいので、ここでは「塗りパス」でドーナツ扇形を構築。
-   // ただし stroke で太さを出す場合は circle+stroke-dasharray 等でも実現可能。
-   return [
-     `M ${x0.toFixed(2)} ${y0.toFixed(2)}`,
-     `A ${rOuter} ${rOuter} 0 ${largeArc} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`,
-     `L ${xi0.toFixed(2)} ${yi0.toFixed(2)}`,
-     `A ${rInner} ${rInner} 0 ${largeArc} 0 ${xi1.toFixed(2)} ${yi1.toFixed(2)}`,
-     'Z'
-   ].join(' ');
- }
+function donutPath(cx, cy, rOuter, rInner, angleDeg) {
+  const a = Math.max(0, Math.min(360, angleDeg));
+  if (a === 0) return '';
+
+  // 12時起点（-90°）
+  const startA = (-90) * Math.PI / 180;
+  const endA   = (-90 + a) * Math.PI / 180;
+
+  // 360度は特別処理：外周を180°×2、内周も逆回りで180°×2
+  if (a === 360) {
+    const midA = (90) * Math.PI / 180; // 12時→6時→12時 に戻る
+
+    // 外周: 上(12時)→下(6時)→上(12時)（時計回り）
+    const xOuterTop = cx + rOuter * Math.cos(startA);
+    const yOuterTop = cy + rOuter * Math.sin(startA);
+    const xOuterBot = cx + rOuter * Math.cos(midA);
+    const yOuterBot = cy + rOuter * Math.sin(midA);
+
+    // 内周: 上→下→上（反時計回りで戻る）
+    const xInnerTop = cx + rInner * Math.cos(startA);
+    const yInnerTop = cy + rInner * Math.sin(startA);
+    const xInnerBot = cx + rInner * Math.cos(midA);
+    const yInnerBot = cy + rInner * Math.sin(midA);
+
+    // large-arc=1, sweep: 外=1(時計回り), 内=0(反時計回り)
+    return [
+      // 外周をぐるっと一周
+      `M ${xOuterTop} ${yOuterTop}`,
+      `A ${rOuter} ${rOuter} 0 1 1 ${xOuterBot} ${yOuterBot}`,
+      `A ${rOuter} ${rOuter} 0 1 1 ${xOuterTop} ${yOuterTop}`,
+      // 内周へ移動して逆回り
+      `L ${xInnerTop} ${yInnerTop}`,
+      `A ${rInner} ${rInner} 0 1 0 ${xInnerBot} ${yInnerBot}`,
+      `A ${rInner} ${rInner} 0 1 0 ${xInnerTop} ${yInnerTop}`,
+      'Z'
+    ].join(' ');
+  }
+
+  // 0 < a < 360 は通常のドーナツ扇形
+  const x0 = cx + rOuter * Math.cos(startA);
+  const y0 = cy + rOuter * Math.sin(startA);
+  const x1 = cx + rOuter * Math.cos(endA);
+  const y1 = cy + rOuter * Math.sin(endA);
+
+  const xi0 = cx + rInner * Math.cos(endA);
+  const yi0 = cy + rInner * Math.sin(endA);
+  const xi1 = cx + rInner * Math.cos(startA);
+  const yi1 = cy + rInner * Math.sin(startA);
+
+  const largeArc = a > 180 ? 1 : 0;
+
+  return [
+    `M ${x0} ${y0}`,
+    `A ${rOuter} ${rOuter} 0 ${largeArc} 1 ${x1} ${y1}`,
+    `L ${xi0} ${yi0}`,
+    `A ${rInner} ${rInner} 0 ${largeArc} 0 ${xi1} ${yi1}`,
+    'Z'
+  ].join(' ');
+}
+
  
  /* ========== サウンド（Web Audio API） ========== */
  let audioCtx = null;

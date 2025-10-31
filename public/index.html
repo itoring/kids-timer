@@ -22,7 +22,7 @@
         <h1 class="visually-hidden" id="app-title-h1">タイマー</h1>
         <button
           id="btn-lang-toggle"
-          class="btn btn-secondary"
+          class="btn btn-secondary" 
           aria-pressed="false"
           aria-controls="app"
           aria-live="off"
@@ -39,14 +39,17 @@
           <h2 id="dial-label" class="visually-hidden">アナログ表示</h2>
 
           <!-- SVG: 外側=分、内側=秒。12時起点・時計回り。円弧はドーナツ状の扇形 -->
-          <svg id="dial-svg" viewBox="0 0 240 240" role="img" aria-hidden="true">
+          <svg id="dial-svg" viewBox="0 0 240 260" role="img" aria-hidden="true">
             <!-- 背景リング（外=分, 内=秒） -->
-            <circle id="ring-minutes" cx="120" cy="120" r="100" class="ring ring-min" />
-            <circle id="ring-seconds" cx="120" cy="120" r="70" class="ring ring-sec" />
+            <circle id="ring-minutes" cx="120" cy="130" r="100" class="ring ring-min" />        
+            <circle id="ring-seconds" cx="120" cy="130" r="60" class="ring ring-sec" />
 
             <!-- 塗りつぶし扇形（ドーナツ） -->
             <path id="arc-minutes" class="arc arc-min" d="" />
             <path id="arc-seconds" class="arc arc-sec" d="" />
+
+            <!-- ★ 追加：文字盤中心→数字へ向かう線 -->
+            <g id="ticks" aria-hidden="true"></g>
 
             <!-- 目盛りラベル（0,10,20,30,40,50を外側に表示） -->
             <g id="labels">
@@ -58,12 +61,6 @@
         <!-- 操作パネル -->
         <section id="panel" class="panel" aria-labelledby="panel-label">
           <h2 id="panel-label" class="visually-hidden">設定と操作</h2>
-
-          <!-- 分・秒ラベル -->
-          <div class="labels">
-            <span id="label-min" class="unit-label" aria-hidden="true">分</span>
-            <span id="label-sec" class="unit-label" aria-hidden="true">秒</span>
-          </div>
 
           <!-- デジタル表示と上下ボタン（タップ領域44px以上） -->
           <div class="digits">
@@ -80,7 +77,7 @@
               <button id="btn-m-ones-down" class="btn btn-down" aria-label="分一の位を減らす">▼</button>
             </div>
 
-            <div class="colon" aria-hidden="true">:</div>
+            <span id="label-min" class="unit-label" aria-hidden="true">分</span>
 
             <!-- 秒：十の位 -->
             <div class="digit-col">
@@ -94,6 +91,8 @@
               <div id="digit-s-ones" class="digit" role="status" aria-live="off" aria-label="秒一の位">0</div>
               <button id="btn-s-ones-down" class="btn btn-down" aria-label="秒一の位を減らす">▼</button>
             </div>
+
+            <span id="label-sec" class="unit-label" aria-hidden="true">秒</span>
           </div>
 
           <!-- スタート/ストップ、リセット -->

@@ -6,17 +6,17 @@
    ========================================================================== */
 
    :root {
-    --bg: #0b0c0c;
-    --panel: #111214;
-    --text: #ffffff;
+    --bg: #ffffff;
+    --panel: #fafafa;
+    --text: #0b0c0c;
     --accent: #00c2ff; /* 秒の色 */
-    --accent2: #ffcc00; /* 分の色 */
+    --accent2: #ffa500; /* 分の色 */
     --muted: #9aa3ab;
     --error: #ff4d4f;
     --ok: #00d084;
   
-    --ring-stroke: 10;
-    --arc-gap: 6; /* ドーナツの外内間の隙間風味（見た目調整） */
+    --ring-stroke: 5;
+    --arc-gap: 10; /* ドーナツの外内間の隙間風味（見た目調整） */
   
     --tap-min: 44px;
     --radius: 16px;
@@ -89,7 +89,7 @@
   .dial {
     display: grid;
     place-items: center;
-    background: #0e0f11;
+    background: #fafafa;
     border: 1px solid #1b1f24;
     border-radius: var(--radius);
     padding: 12px;
@@ -110,30 +110,37 @@
   }
   
   .ring-min {
-    stroke: #1f2730;
+    stroke: #dcdcdc;
   }
   .ring-sec {
-    stroke: #171e24;
+    stroke: #dcdcdc;
   }
   
   .arc {
-    fill: none;
+    stroke: none;
     stroke-linecap: butt;
   }
   
   /* 分の扇形（外側ドーナツ） */
   .arc-min {
-    stroke: var(--accent2);
-    stroke-width: 24; /* ドーナツ厚さ */
+    fill: var(--accent2);
   }
   
   /* 秒の扇形（内側ドーナツ） */
   .arc-sec {
-    stroke: var(--accent);
-    stroke-width: 24;
+    fill: var(--accent);
   }
-  
-  /* ラベル文字（0,10,20,30,40,50） */
+
+  /* 文字盤の線 */
+  #ticks line {
+    stroke: var(--muted);
+    stroke-width: 1.5;
+    opacity: 0.6;
+    vector-effect: non-scaling-stroke;
+    pointer-events: none;
+  }
+
+/* ラベル文字（0,10,20,30,40,50） */
   #labels text {
     fill: var(--muted);
     font-size: 12px;
@@ -143,9 +150,11 @@
   
   /* パネル */
   .panel {
-    display: grid;
-    grid-template-rows: auto auto auto 1fr;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     gap: 12px;
+    align-content: center;
     background: var(--panel);
     border: 1px solid #1b1f24;
     border-radius: var(--radius);
@@ -161,11 +170,11 @@
   }
   
   .unit-label {
+    font-size: 50px;
     padding: 2px 8px;
-    background: #0d1116;
+    background: #fafafa;
     border-radius: 999px;
-    border: 1px solid #232a33;
-  }
+    }
   
   /* デジタル表示 */
   .digits {
@@ -187,19 +196,19 @@
   .digit {
     min-width: 56px;
     text-align: center;
-    font-size: 40px;
+    font-size: 150px;
     line-height: 1;
     padding: 8px 12px;
     border-radius: 8px;
     border: 2px solid #2a313a;
-    background: #0f141a;
+    background: #fafafa;
   }
   
   /* 無効操作の軽いアテンション（点灯） */
   .digit.flash {
     animation: flash 240ms ease-in-out 1;
     border-color: var(--error);
-    color: #fff;
+/*    color: #fff;*/
   }
   @keyframes flash {
     0% {
@@ -226,7 +235,7 @@
     padding: 8px 12px;
     border-radius: 10px;
     border: 2px solid #29323c;
-    background: #0e1319;
+    background: #fafafa;
     color: var(--text);
     cursor: pointer;
     user-select: none;
@@ -234,7 +243,7 @@
   }
   .btn:hover {
     transform: translateY(-1px);
-    background: #121a22;
+    background: #c0c0c0;
   }
   .btn:active {
     transform: translateY(0);
@@ -245,7 +254,7 @@
   }
   
   .btn-primary {
-    background: #1a2230;
+    background: #fafafa;
     border-color: #2b394a;
   }
   .btn-primary:focus-visible {
@@ -253,16 +262,22 @@
   }
   
   .btn-secondary {
-    background: #141a23;
+
+    background: #fafafa;
     border-color: #2b3542;
   }
   .btn-secondary:focus-visible {
     outline: 3px solid var(--accent);
   }
+  .btn-primary,
+  .btn-secondary {
+    font-size: 20px;
+  }
   
   .btn-up,
   .btn-down {
-    width: 56px;
+    font-size: 20px;
+    width: 100px;
   }
   
   /* コントロール行 */
@@ -270,7 +285,13 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
-  }
+    margin-top: 30px;
+}
+
+#btn-startstop,
+#btn-reset {
+    padding: 20px;
+}
   
   /* ライブメッセージ */
   .live {
