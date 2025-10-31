@@ -1,0 +1,83 @@
+{
+    "meta": {
+    "lang": "ja",
+    "modes": ["normal", "hiragana"]
+    },
+    "app": {
+    "title": {
+    "normal": "タイマー",
+    "hiragana": "たいまあ"
+    },
+    "toggle_button": {
+    "to_hiragana": {
+    "normal": "ひらがな",
+    "hiragana": "ひらがな"
+    },
+    "to_kanji": {
+    "normal": "かんじ",
+    "hiragana": "かんじ"
+    }
+    }
+    },
+    "units": {
+    "minutes": {
+    "normal": "分",
+    "hiragana": "ふん"
+    },
+    "seconds": {
+    "normal": "秒",
+    "hiragana": "びょう"
+    }
+    },
+    "buttons": {
+    "start": {
+    "normal": "スタート",
+    "hiragana": "すたあと"
+    },
+    "stop": {
+    "normal": "ストップ",
+    "hiragana": "すとっぷ"
+    },
+    "reset": {
+    "normal": "リセット",
+    "hiragana": "りせっと"
+    }
+    },
+    "messages": {
+    "max_time_reached": {
+    "normal": "最大時間です",
+    "hiragana": "もう　ふやせません"
+    },
+    "need_time_to_start": {
+    "normal": "時間を設定してください",
+    "hiragana": "じかんを　きめて　ください"
+    },
+    "finished": {
+    "normal": "完了しました",
+    "hiragana": "おわりました"
+    },
+    "controls_locked_while_running": {
+    "normal": "カウント中は操作できません",
+    "hiragana": "かうんとちゅうは　そうさ　できません"
+    },
+    "at_zero_no_start": {
+    "normal": "00:00では開始できません",
+    "hiragana": "れいれい：れいれいでは　かいし　できません"
+    }
+    },
+    "aria": {
+    "toggle_to_hiragana": {
+    "normal": "ひらがな表示に切り替え",
+    "hiragana": "ひらがな　ひょうじに　きりかえ"
+    },
+    "toggle_to_kanji": {
+    "normal": "漢字カタカナ表示に切り替え",
+    "hiragana": "かんじ　かたかな　ひょうじに　きりかえ"
+    },
+    "current_total_time": {
+    "normal": "現在の合計時間",
+    "hiragana": "げんざいの　ごうけいじかん"
+    }
+    }
+    }
+    

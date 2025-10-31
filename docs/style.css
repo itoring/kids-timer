@@ -1,0 +1,303 @@
+/* ==========================================================================
+   ベース
+   - 高コントラスト
+   - タップ領域最小44px
+   - モバイル縦で上下レイアウト
+   ========================================================================== */
+
+   :root {
+    --bg: #ffffff;
+    --panel: #fafafa;
+    --text: #0b0c0c;
+    --accent: #00c2ff; /* 秒の色 */
+    --accent2: #ffa500; /* 分の色 */
+    --muted: #9aa3ab;
+    --error: #ff4d4f;
+    --ok: #00d084;
+  
+    --ring-stroke: 5;
+    --arc-gap: 10; /* ドーナツの外内間の隙間風味（見た目調整） */
+  
+    --tap-min: 44px;
+    --radius: 16px;
+    --shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
+  }
+  
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+  
+  html,
+  body {
+    height: 100%;
+  }
+  
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP",
+      "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", "Meiryo",
+      "Helvetica", Arial, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+  }
+  
+  /* 視覚的に非表示（スクリーンリーダには読ませる） */
+  .visually-hidden {
+    position: absolute !important;
+    left: -9999px !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+    clip: rect(1px, 1px, 1px, 1px) !important;
+  }
+  
+  /* アプリレイアウト */
+  .app {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    min-height: 100dvh;
+  }
+  
+  .app-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--panel);
+    border-bottom: 1px solid #222;
+  }
+  
+  .app-main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding: 16px;
+  }
+  
+  /* 600px以下は上下レイアウト */
+  @media (max-width: 600px) {
+    .app-main {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto;
+    }
+  }
+  
+  /* 文字盤セクション */
+  .dial {
+    display: grid;
+    place-items: center;
+    background: #fafafa;
+    border: 1px solid #1b1f24;
+    border-radius: var(--radius);
+    padding: 12px;
+    box-shadow: var(--shadow);
+  }
+  
+  /* SVGリング・扇形 */
+  #dial-svg {
+    width: min(90vw, 480px);
+    max-width: 100%;
+    height: auto;
+  }
+  
+  .ring {
+    fill: none;
+    stroke: #22272e;
+    stroke-width: var(--ring-stroke);
+  }
+  
+  .ring-min {
+    stroke: #dcdcdc;
+  }
+  .ring-sec {
+    stroke: #dcdcdc;
+  }
+  
+  .arc {
+    stroke: none;
+    stroke-linecap: butt;
+  }
+  
+  /* 分の扇形（外側ドーナツ） */
+  .arc-min {
+    fill: var(--accent2);
+  }
+  
+  /* 秒の扇形（内側ドーナツ） */
+  .arc-sec {
+    fill: var(--accent);
+  }
+
+  /* 文字盤の線 */
+  #ticks line {
+    stroke: var(--muted);
+    stroke-width: 1.5;
+    opacity: 0.6;
+    vector-effect: non-scaling-stroke;
+    pointer-events: none;
+  }
+
+/* ラベル文字（0,10,20,30,40,50） */
+  #labels text {
+    fill: var(--muted);
+    font-size: 12px;
+    text-anchor: middle;
+    dominant-baseline: middle;
+  }
+  
+  /* パネル */
+  .panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 12px;
+    align-content: center;
+    background: var(--panel);
+    border: 1px solid #1b1f24;
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+  
+  .labels {
+    display: flex;
+    justify-content: space-between;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  
+  .unit-label {
+    font-size: 50px;
+    padding: 2px 8px;
+    background: #fafafa;
+    border-radius: 999px;
+    }
+  
+  /* デジタル表示 */
+  .digits {
+    display: grid;
+    grid-auto-flow: column;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .digit-col {
+    display: grid;
+    grid-template-rows: var(--tap-min) auto var(--tap-min);
+    align-items: center;
+    justify-items: center;
+    gap: 6px;
+  }
+  
+  .digit {
+    min-width: 56px;
+    text-align: center;
+    font-size: 150px;
+    line-height: 1;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 2px solid #2a313a;
+    background: #fafafa;
+  }
+  
+  /* 無効操作の軽いアテンション（点灯） */
+  .digit.flash {
+    animation: flash 240ms ease-in-out 1;
+    border-color: var(--error);
+/*    color: #fff;*/
+  }
+  @keyframes flash {
+    0% {
+      box-shadow: 0 0 0 rgba(255, 77, 79, 0.0);
+    }
+    50% {
+      box-shadow: 0 0 24px rgba(255, 77, 79, 0.5);
+    }
+    100% {
+      box-shadow: 0 0 0 rgba(255, 77, 79, 0.0);
+    }
+  }
+  
+  .colon {
+    font-size: 36px;
+    color: var(--muted);
+    padding: 0 8px;
+  }
+  
+  /* ボタン */
+  .btn {
+    min-width: var(--tap-min);
+    min-height: var(--tap-min);
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 2px solid #29323c;
+    background: #fafafa;
+    color: var(--text);
+    cursor: pointer;
+    user-select: none;
+    transition: transform 100ms ease, background 100ms ease, border-color 100ms ease;
+  }
+  .btn:hover {
+    transform: translateY(-1px);
+    background: #c0c0c0;
+  }
+  .btn:active {
+    transform: translateY(0);
+  }
+  .btn[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .btn-primary {
+    background: #fafafa;
+    border-color: #2b394a;
+  }
+  .btn-primary:focus-visible {
+    outline: 3px solid var(--ok);
+  }
+  
+  .btn-secondary {
+
+    background: #fafafa;
+    border-color: #2b3542;
+  }
+  .btn-secondary:focus-visible {
+    outline: 3px solid var(--accent);
+  }
+  .btn-primary,
+  .btn-secondary {
+    font-size: 20px;
+  }
+  
+  .btn-up,
+  .btn-down {
+    font-size: 20px;
+    width: 100px;
+  }
+  
+  /* コントロール行 */
+  .controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 30px;
+}
+
+#btn-startstop,
+#btn-reset {
+    padding: 20px;
+}
+  
+  /* ライブメッセージ */
+  .live {
+    min-height: 1.6em;
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  
