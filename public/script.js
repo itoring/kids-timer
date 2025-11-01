@@ -249,14 +249,16 @@ function onAdjust(kind, delta) {
 
   const before = getCurrentTime();
 
-  // 60:00のときの特例（秒の上下は無反応、分十↓は50:00 に、分一↓は59:00に）
+  // 60:00のときの特例（分一↓と秒の上下は無反応、分十↓は50:00 に、分十↑は00:00 に）
   if (before.m === 60 && before.s === 0) {
-    if (kind === 'mTens' && delta < 0) {
-      setTime(50, 0);
-      updateAllViews();
-    } else if (kind === 'mOnes' && delta < 0) {
-      setTime(59, 0);
-      updateAllViews();
+    if (kind === 'mTens') {
+      if (delta < 0) {
+        setTime(50, 0);
+        updateAllViews();
+      } else {
+        setTime(0, 0);
+        updateAllViews();
+      }
     } else {
       // 無反応
       speak('messages.max_time_reached');
@@ -275,26 +277,27 @@ function onAdjust(kind, delta) {
   };
 
   if (kind === 'mTens') {
-    // 分 十↑：+10。ただし 59:xx でも 60:00 へ
-    // 55:30 → 分十↑ → 60:00, 59:59 → 分十↑ → 60:00
+    // 分 十↑：+10。
     if (delta > 0) {
       const totalM = mTens * 10 + mOnes;
       const newM = totalM + 10;
-      if (newM >= 60 || (totalM >= 55)) {
+      if (newM === 60) {
         setTime(60, 0);
+      } else if (newM > 60) {
+        mTens = 0;
+        setDigits({ mTens, mOnes, sTens, sOnes });
       } else {
-        mTens = Math.min(5, mTens + 1);
-        // 分の総和が60になる操作は最終的に60:00へ寄せる（ただしここでは59まで）
+        mTens = mTens + 1;
         setDigits({ mTens, mOnes, sTens, sOnes });
       }
     } else {
-      // 分 十↓：60:00のときだけ50:00（上で特例処理済み）
+      // 分 十↓：00:00のときだけ60:00（上で特例処理済み）
       const totalM = mTens * 10 + mOnes;
       if (totalM === 0) {
-        // 0未満不可
-        applyInvalid();
+          mTens = 6;
+          setDigits({ mTens, mOnes, sTens, sOnes });
       } else {
-        // 10分単位で-10（ただし0未満不可）
+        // 10分単位で-10。ただしマイナスの場合は5にループ
         if (totalM - 10 < 0) {
           mTens = 5;
           setDigits({ mTens, mOnes, sTens, sOnes });
@@ -305,17 +308,17 @@ function onAdjust(kind, delta) {
       }
     }
   } else if (kind === 'mOnes') {
-    // 分 一↑↓：0〜60の範囲で±1。
-    const totalM = mTens * 10 + mOnes + delta;
-    const totalS = sTens * 10 + sOnes;
-    if (totalM < 0) {
-      applyInvalid();
-    } else if (totalM > 59 && totalS > 0) {
-        setTime(60, 0);
+    // 分 一↑↓：0〜9の範囲で±1。
+    const newVal = mOnes + delta;
+    if (newVal < 0) {
+      mOnes = 9;
+      setDigits({ mTens, mOnes, sTens, sOnes });
+    } else if(newVal > 9) {
+      mOnes = 0;
+      setDigits({ mTens, mOnes, sTens, sOnes });
     } else {
-      const nmTens = Math.floor(totalM / 10);
-      const nmOnes = totalM % 10;
-      setDigits({ mTens: nmTens, mOnes: nmOnes, sTens, sOnes });
+      mOnes = newVal;
+      setDigits({ mTens, mOnes, sTens, sOnes });
     }
   } else if (kind === 'sTens') {
     // 秒 十：0〜5の範囲。6不可
@@ -331,16 +334,16 @@ function onAdjust(kind, delta) {
       setDigits({ mTens, mOnes, sTens, sOnes });
     }
   } else if (kind === 'sOnes') {
-    // 秒 一：0〜59の範囲で±1。10不可
-    const totalS = sTens * 10 +sOnes + delta;
-    if (totalS < 0) {
-      applyInvalid();
-    } else if (totalS > 59) {
-      setDigits({mTens, mOnes, sTens: 0, sOnes: 0});
+    const newVal = sOnes + delta;
+    if (newVal < 0) {
+      sOnes = 9;
+      setDigits({mTens, mOnes, sTens, sOnes});
+    } else if (newVal > 9) {
+      sOnes = 0;
+      setDigits({mTens, mOnes, sTens, sOnes});
     } else {
-      const nsTens = Math.floor(totalS / 10);
-      const nsOnes = totalS % 10;
-      setDigits({mTens, mOnes, sTens: nsTens, sOnes: nsOnes});
+      sOnes = newVal;
+      setDigits({ mTens, mOnes, sTens, sOnes });
     }
   }
 
