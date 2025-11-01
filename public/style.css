@@ -62,7 +62,7 @@
   
   .app-header {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     align-items: center;
     gap: 12px;
     padding: 12px 16px;
@@ -194,7 +194,8 @@
   }
   
   .digit {
-    min-width: 56px;
+/*    min-width: 56px; */
+    width: 120px;
     text-align: center;
     font-size: 150px;
     line-height: 1;
@@ -277,7 +278,7 @@
   .btn-up,
   .btn-down {
     font-size: 20px;
-    width: 100px;
+    width: 120px;
   }
   
   /* コントロール行 */
