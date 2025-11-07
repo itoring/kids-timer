@@ -30,14 +30,40 @@ let dict = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
   cacheElements();
+
+  // 1) 辞書読み込み（これが終わるまで待たないと dict が null）
   await loadDictionary();
-  restoreLangMode();
+
+  // 2) クエリ解析（t=MMSS, mode=hira|kanji）
+  const q = parseQuery();
+
+  // 3) ページ判定：共有ページかどうか
+  const isSharePage = !!document.getElementById('share-page');
+
+  // 4) モード決定（クエリ優先 → localStorage更新）
+  const initialMode = urlModeToState(q.mode);
+  state.mode = initialMode;
+  localStorage.setItem(STORAGE_KEY, state.mode);
+
+  // 5) 共有ページだった場合はここで処理を分ける
+  if (isSharePage) {
+    setupShareTexts();       // dict からボタンやタイトルを反映
+    bindSharePageIfPresent(); // URL生成・コピー処理
+    return;               // タイマーの初期化は不要
+  }
+
+  // 6) 通常タイマー初期化
   setupUITexts();
+  const initM = q.tValid ? q.m : 0;
+  const initS = q.tValid ? q.s : 0;
+  setTime(initM, initS);
   layoutDialLabels();
   layoutDialTicks();
   bindEvents();
-  updateAllViews(); // 00:00描画
+  updateAllViews();
 });
+
+
 
 /* 主要要素のキャッシュ */
 function cacheElements() {
@@ -89,15 +115,18 @@ function setupUITexts() {
   if (h1) h1.textContent = t('app.title');
 
   // 単位ラベル
-  els['label-min'].textContent = t('units.minutes');
-  els['label-sec'].textContent = t('units.seconds');
+  if (els['label-min']) els['label-min'].textContent = t('units.minutes');
+  if (els['label-sec']) els['label-sec'].textContent = t('units.seconds');
 
   // 言語トグルボタンの表示テキストと aria
-  setLangToggleButtonFace();
+  if (els['btn-lang-toggle']) setLangToggleButtonFace();
 
   // スタート/ストップ・リセット
   refreshStartStopLabel();
-  els['btn-reset'].textContent = t('buttons.reset');
+  if (els['btn-reset']) els['btn-reset'].textContent = t('buttons.reset');
+
+  const shareFab = document.getElementById('btn-share-url');
+  if (shareFab) shareFab.textContent = dict.share.make_button[state.mode];
 }
 
 /* 言語トグルボタンの顔（仕様：初期は「ひらがな」。押すとUI全体がひらがな化し、ボタンは「かんじ」） */
@@ -229,6 +258,17 @@ function bindEvents() {
       enterPause();
     }
   });
+
+  // 右下：URL生成ボタン → /share.html へ現在の設定で遷移
+  const shareFab = document.getElementById('btn-share-url');
+  if (shareFab) {
+    shareFab.addEventListener('click', () => {
+      const { m, s } = getCurrentTime();
+      const mmss = toMMSS(m, s);
+      const urlMode = stateModeToUrl(state.mode);
+      location.href = `./share.html?t=${mmss}&mode=${urlMode}`;
+    });
+  }
 }
 
 /* ========== 入力・ガード・仕様ロジック ========== */
@@ -739,3 +779,108 @@ function announceCurrentTotal() {
 /* 手動でコンソールから:
   setTime(55,30); updateAllViews();
   などで確認可能。 */
+
+/* ========= クエリ解析 & 共有URL生成 ========= */
+function parseQuery() {
+  const u = new URL(location.href);
+  const rawT = u.searchParams.get('t');       // MMSS
+  const rawMode = u.searchParams.get('mode'); // hira|kanji
+
+  // 時間
+  const res = parseMMSS(rawT);
+  // モード
+  const mode = parseMode(rawMode);
+
+  return { tValid: res.valid, m: res.m, s: res.s, mode };
+}
+
+function parseMMSS(t) {
+  if (!t || !/^[0-9]{4}$/.test(t)) return { valid:false, m:0, s:0 };
+  const mm = parseInt(t.slice(0,2), 10);
+  const ss = parseInt(t.slice(2,4), 10);
+  if (mm < 0 || mm > 60) return { valid:false, m:0, s:0 };
+  if (ss < 0 || ss > 59) return { valid:false, m:0, s:0 };
+  if (mm === 60 && ss !== 0) return { valid:false, m:0, s:0 };
+  return { valid:true, m:mm, s:ss };
+}
+
+function parseMode(v) {
+  if (!v) return 'kanji'; // 既定
+  const s = String(v).toLowerCase();
+  return (s === 'hira' || s === 'kanji') ? s : 'kanji';
+}
+
+// internal 'normal'|'hiragana' と URL 'kanji'|'hira' の相互変換
+function urlModeToState(mode) {
+  return mode === 'hira' ? 'hiragana' : 'normal';
+}
+function stateModeToUrl(stateMode) {
+  return stateMode === 'hiragana' ? 'hira' : 'kanji';
+}
+
+// MM,SS → "MMSS"
+function toMMSS(m, s) {
+  return String(m).padStart(2,'0') + String(s).padStart(2,'0');
+}
+
+// 共有用フルURLを作る（/share.html 側で使用）
+function buildOpenUrl(m, s, urlMode) {
+  const base = `${location.origin}${location.pathname.replace(/share\.html$/,'')}`;
+  const path = base.endsWith('/') ? '' : '/';
+  return `${location.origin}/${'?t=' + toMMSS(m,s) + '&mode=' + urlMode}`;
+}
+
+/* ========= 共有ページ：URL表示・コピー・戻る ========= */
+function setupShareTexts() {
+  // share.html にだけ存在する要素に限定して触る
+  const titleEl = document.getElementById('share-title');
+  const copyBtn = document.getElementById('btn-copy');
+  const backBtn = document.getElementById('btn-back');
+  if (titleEl) titleEl.textContent = dict.share.title[state.mode];
+  if (copyBtn) copyBtn.textContent = dict.share.copy[state.mode];
+  if (backBtn) backBtn.textContent = dict.share.back[state.mode];
+}
+
+function bindSharePageIfPresent() {
+  const input = document.getElementById('share-url');
+  const copyBtn = document.getElementById('btn-copy');
+  const backBtn = document.getElementById('btn-back');
+  const titleEl = document.getElementById('share-title');
+  if (!input || !copyBtn || !backBtn || !titleEl) return; // タイマー画面なら何もしない
+
+  // 表記（タイトル/ボタン）をモードに合わせて
+  titleEl.textContent = dict.share.title[state.mode];
+  copyBtn.textContent = dict.share.copy[state.mode];
+  backBtn.textContent = dict.share.back[state.mode];
+
+  // 自ページのクエリを読み、配布用URLを生成（index.html 直下のURL）
+  const q = parseQuery();
+  const m = q.tValid ? q.m : 0;
+  const s = q.tValid ? q.s : 0;
+  const urlMode = q.mode; // 'hira' | 'kanji'
+  const openUrl = `${location.origin}/?t=${toMMSS(m,s)}&mode=${urlMode}`;
+  input.value = openUrl;
+
+  // コピー
+  copyBtn.addEventListener('click', async () => {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(input.value);
+      } else {
+        input.select(); document.execCommand('copy'); input.blur();
+      }
+      const live = document.getElementById('live');
+      if (live) live.textContent = dict.share.copied[state.mode];
+    } catch (e) { /* 無言（仕様：エラーメッセージなし） */ }
+  });
+
+  // 戻る
+  backBtn.addEventListener('click', () => {
+    if (history.length > 1) {
+      history.back();
+    } else {
+      // 履歴が無い場合は index へ戻す（同じ設定で）
+      location.href = openUrl;
+    }
+  });
+}

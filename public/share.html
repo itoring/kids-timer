@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>時間&モード指定のURL｜こどもたいまー</title>
+  <link rel="stylesheet" href="./style.css" />
+  <script type="module" src="./script.js" defer></script>
+</head>
+<body>
+  <main class="share-container" id="share-page">
+    <h1 class="share-title" id="share-title">時間&モード指定のURL</h1>
+
+    <div class="share-box">
+      <input id="share-url" type="text" readonly aria-label="生成されたURL" />
+      <button id="btn-copy" class="btn btn-primary">コピー</button>
+    </div>
+
+    <div id="live" class="share-live" aria-live="polite"></div>
+
+    <div class="share-actions">
+      <button id="btn-back" class="btn btn-secondary">戻る</button>
+    </div>
+  </main>
+</body>
+</html>

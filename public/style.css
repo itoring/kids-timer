@@ -301,4 +301,40 @@
     color: var(--muted);
     font-size: 14px;
   }
-  
+
+  /* === 右下のURL生成ボタン（固定配置） === */
+.share-fab {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 1000;
+}
+
+/* === 共有ページの縦中央レイアウト === */
+.share-container {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* 縦中央 */
+  align-items: center;     /* 横中央 */
+  gap: 16px;
+  padding: 16px;
+  background: var(--bg);
+}
+.share-title { font-size: 22px; margin: 0 0 8px; }
+.share-box {
+  width: min(740px, 92vw);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+#share-url {
+  width: 100%;
+  padding: 12px;
+  font-size: 18px;
+  border: 2px solid #29323c;
+  border-radius: 8px;
+  background: #f5f5f5;
+}
+.share-actions { display: flex; gap: 12px; }
+.share-live { min-height: 1.6em; font-size: 14px; }
