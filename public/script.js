@@ -45,13 +45,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   state.mode = initialMode;
   localStorage.setItem(STORAGE_KEY, state.mode);
 
-  // 5) 共有ページだった場合はここで処理を分ける
-  if (isSharePage) {
-    setupShareTexts();       // dict からボタンやタイトルを反映
-    bindSharePageIfPresent(); // URL生成・コピー処理
-    return;               // タイマーの初期化は不要
-  }
-
   // 6) 通常タイマー初期化
   setupUITexts();
   const initM = q.tValid ? q.m : 0;
@@ -125,8 +118,12 @@ function setupUITexts() {
   refreshStartStopLabel();
   if (els['btn-reset']) els['btn-reset'].textContent = t('buttons.reset');
 
+  // URL作成、コピー
   const shareFab = document.getElementById('btn-share-url');
+  const copyBtn = document.getElementById('btn-copy');
   if (shareFab) shareFab.textContent = dict.share.make_button[state.mode];
+  if (copyBtn) copyBtn.textContent = dict.share.copy[state.mode];
+
 }
 
 /* 言語トグルボタンの顔（仕様：初期は「ひらがな」。押すとUI全体がひらがな化し、ボタンは「かんじ」） */
@@ -199,7 +196,7 @@ function layoutDialLabels() {
   const g = document.getElementById('labels');
   g.innerHTML = '';
   const cx = 120, cy = 130;
-  const r = 120; // 外周より少し外に出すと読みやすい
+  const r = 115; // 外周より少し外に出すと読みやすい
   const labels = [0, 10, 20, 30, 40, 50];
   labels.forEach((val, i) => {
     const deg = -90 + i * 60; // 12時起点
@@ -259,16 +256,28 @@ function bindEvents() {
     }
   });
 
-  // 右下：URL生成ボタン → /share.html へ現在の設定で遷移
+  // URL生成ボタン
   const shareFab = document.getElementById('btn-share-url');
-  if (shareFab) {
-    shareFab.addEventListener('click', () => {
-      const { m, s } = getCurrentTime();
-      const mmss = toMMSS(m, s);
-      const urlMode = stateModeToUrl(state.mode);
-      location.href = `./share.html?t=${mmss}&mode=${urlMode}`;
-    });
-  }
+  shareFab.addEventListener('click', () => {
+    const { m, s } = getCurrentTime();
+    const input = document.getElementById('share-url');
+    input.value = `${location.origin}/?t=${toMMSS(m,s)}&mode=${stateModeToUrl(state.mode)}`;
+  });
+
+    // コピー
+  const copyBtn = document.getElementById('btn-copy');
+  copyBtn.addEventListener('click', async () => {
+    const input = document.getElementById('share-url');
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(input.value);
+      } else {
+        input.select(); document.execCommand('copy'); input.blur();
+      }
+      const live = document.getElementById('live');
+      if (live) live.textContent = dict.share.copied[state.mode];
+    } catch (e) { /* 無言（仕様：エラーメッセージなし） */ }
+  });
 }
 
 /* ========== 入力・ガード・仕様ロジック ========== */
@@ -828,59 +837,4 @@ function buildOpenUrl(m, s, urlMode) {
   const base = `${location.origin}${location.pathname.replace(/share\.html$/,'')}`;
   const path = base.endsWith('/') ? '' : '/';
   return `${location.origin}/${'?t=' + toMMSS(m,s) + '&mode=' + urlMode}`;
-}
-
-/* ========= 共有ページ：URL表示・コピー・戻る ========= */
-function setupShareTexts() {
-  // share.html にだけ存在する要素に限定して触る
-  const titleEl = document.getElementById('share-title');
-  const copyBtn = document.getElementById('btn-copy');
-  const backBtn = document.getElementById('btn-back');
-  if (titleEl) titleEl.textContent = dict.share.title[state.mode];
-  if (copyBtn) copyBtn.textContent = dict.share.copy[state.mode];
-  if (backBtn) backBtn.textContent = dict.share.back[state.mode];
-}
-
-function bindSharePageIfPresent() {
-  const input = document.getElementById('share-url');
-  const copyBtn = document.getElementById('btn-copy');
-  const backBtn = document.getElementById('btn-back');
-  const titleEl = document.getElementById('share-title');
-  if (!input || !copyBtn || !backBtn || !titleEl) return; // タイマー画面なら何もしない
-
-  // 表記（タイトル/ボタン）をモードに合わせて
-  titleEl.textContent = dict.share.title[state.mode];
-  copyBtn.textContent = dict.share.copy[state.mode];
-  backBtn.textContent = dict.share.back[state.mode];
-
-  // 自ページのクエリを読み、配布用URLを生成（index.html 直下のURL）
-  const q = parseQuery();
-  const m = q.tValid ? q.m : 0;
-  const s = q.tValid ? q.s : 0;
-  const urlMode = q.mode; // 'hira' | 'kanji'
-  const openUrl = `${location.origin}/?t=${toMMSS(m,s)}&mode=${urlMode}`;
-  input.value = openUrl;
-
-  // コピー
-  copyBtn.addEventListener('click', async () => {
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(input.value);
-      } else {
-        input.select(); document.execCommand('copy'); input.blur();
-      }
-      const live = document.getElementById('live');
-      if (live) live.textContent = dict.share.copied[state.mode];
-    } catch (e) { /* 無言（仕様：エラーメッセージなし） */ }
-  });
-
-  // 戻る
-  backBtn.addEventListener('click', () => {
-    if (history.length > 1) {
-      history.back();
-    } else {
-      // 履歴が無い場合は index へ戻す（同じ設定で）
-      location.href = openUrl;
-    }
-  });
 }

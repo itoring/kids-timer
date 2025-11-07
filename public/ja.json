@@ -5,8 +5,8 @@
 },
 "app": {
 "title": {
-"normal": "こどもたいまー",
-"hiragana": "こどもたいまあ"
+"normal": "こどもたいまー｜子供が見やすいほうで見れるタイマー",
+"hiragana": "こどもたいまあ｜こどもも みやすい たいまぁ"
 },
 "toggle_button": {
 "to_hiragana": {
@@ -46,11 +46,11 @@
 "messages": {
 "max_time_reached": {
 "normal": "最大時間です",
-"hiragana": "もう　ふやせません"
+"hiragana": "もう ふやせません"
 },
 "need_time_to_start": {
 "normal": "時間を設定してください",
-"hiragana": "じかんを　きめて　ください"
+"hiragana": "じかんを きめて ください"
 },
 "finished": {
 "normal": "完了しました",
@@ -58,31 +58,31 @@
 },
 "controls_locked_while_running": {
 "normal": "カウント中は操作できません",
-"hiragana": "かうんとちゅうは　そうさ　できません"
+"hiragana": "かうんとちゅうは うごかせません"
 },
 "at_zero_no_start": {
 "normal": "00:00では開始できません",
-"hiragana": "れいれい：れいれいでは　かいし　できません"
+"hiragana": "ぜろふん ぜろびょうでは すたあと できません"
 }
 },
 "aria": {
 "toggle_to_hiragana": {
 "normal": "ひらがな表示に切り替え",
-"hiragana": "ひらがな　ひょうじに　きりかえ"
+"hiragana": "ひらがなに する"
 },
 "toggle_to_kanji": {
 "normal": "漢字カタカナ表示に切り替え",
-"hiragana": "かんじ　かたかな　ひょうじに　きりかえ"
+"hiragana": "かんじと かたかなに する"
 },
 "current_total_time": {
 "normal": "現在の合計時間",
-"hiragana": "げんざいの　ごうけいじかん"
+"hiragana": "げんざいの ごうけいじかん"
 }
 },
 "share": {
 "title": {
-"normal": "URLを作る",
-"hiragana": "URLを　つくる"
+"normal": "時間&モード指定のURL",
+"hiragana": "じかんを きめて ひらける URL"
 },
 "copy": {
 "normal": "コピー",
@@ -90,15 +90,15 @@
 },
 "copied": {
 "normal": "コピーしました！",
-"hiragana": "こぴい　しました！"
+"hiragana": "こぴい しました！"
 },
 "back": {
 "normal": "戻る",
 "hiragana": "もどる"
 },
 "make_button": {
-"normal": "URLを作る",
-"hiragana": "URLを　つくる"
+"normal": "時間&モード指定のURLを作る",
+"hiragana": "じかんを きめて ひらける URLを つくる"
 }
 }
 }

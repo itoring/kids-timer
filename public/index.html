@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
+  <head prefix="og:http://ogp.me/ns#">
     <meta charset="UTF-8" />
     <meta
       name="viewport"
@@ -17,21 +17,29 @@
 
     <!-- ES Module（外部依存なし） -->
     <script type="module" src="./script.js" defer></script>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-H8JJENG1N4"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-H8JJENG1N4"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-  gtag('config', 'G-H8JJENG1N4');
-</script>
+      gtag('config', 'G-H8JJENG1N4');
+    </script>
+
+    <meta property="og:site_name" content="こどもたいまー" />
+    <meta property="og:title" content="こどもたいまー｜子供が見やすいほうで見れるタイマー" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content=" https://kodomo-timer.com" />
+    <meta property="og:image" content=" https://kodomo-timer.com/ogp.png" />
+    <meta property="og:description" content="アナログとデジタル両方の形式で表示するシンプルなタイマーです。学校の授業やご家庭での利用におすすめ。" />
+    <title>こどもたいまー｜子供が見やすいほうで見れるタイマー</title>
   </head>
   <body>
     <div id="app" class="app">
       <!-- ヘッダー：表記切替ボタン -->
       <header id="app-header" class="app-header">
-        <h1 class="visually-hidden" id="app-title-h1">タイマー</h1>
+        <h1 class="visually-hidden" id="app-title-h1">こどもたいまー</h1>
         <img src="title.png" alt="こどもたいまー">
         <button
           id="btn-lang-toggle"
@@ -114,6 +122,12 @@
             <button id="btn-reset" class="btn btn-secondary">リセット</button>
           </div>
 
+          <!-- 時間＆モード指定URL作成 -->
+          <button id="btn-share-url" class="btn btn-primary share-fab" aria-label="時間&モード指定のURLを作る">時間&モード指定のURLを作る</button>
+          <div class="share-box">
+            <input id="share-url" type="text" readonly aria-label="生成されたURL" />
+            <button id="btn-copy" class="btn btn-primary">コピー</button>
+          </div>
           <!-- ライブリージョン（エラーメッセージ等） -->
           <p id="live" class="live" aria-live="polite"></p>
 
@@ -121,8 +135,6 @@
           <p id="sr-total" class="visually-hidden" aria-live="polite">現在の合計時間: 00:00</p>
         </section>
       </main>
-      <!-- （既存）</main> の直後あたり、</div> の直前でもOK：位置は自由 -->
-      <button id="btn-share-url" class="btn btn-primary share-fab" aria-label="時間&モード指定のURLを作る">時間&モード指定のURLを作る</button>
     </div>
   </body>
 </html>
