@@ -97,8 +97,8 @@
 "hiragana": "もどる"
 },
 "make_button": {
-"normal": "時間&モード指定のURLを作る",
-"hiragana": "じかんを きめて ひらける URLを つくる"
+"normal": "今の時間&モード指定のURLを作る",
+"hiragana": "このじかんの たいまあを ひらける URLを つくる"
 }
 }
 }

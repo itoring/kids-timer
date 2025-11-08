@@ -68,6 +68,7 @@ function cacheElements() {
     'btn-s-tens-up','digit-s-tens','btn-s-tens-down',
     'btn-s-ones-up','digit-s-ones','btn-s-ones-down',
     'btn-startstop','btn-reset',
+    'btn-share-url','share-url','btn-copy',
     'label-min','label-sec','live','sr-total'
   ].forEach(id => els[id] = document.getElementById(id));
 }
@@ -550,6 +551,9 @@ function updateButtonsEnabled() {
   }
 
   els['btn-reset'].disabled = !enabled.reset;
+
+  els['btn-share-url'].disabled = !enabled.edit;
+  els['btn-copy'].disabled = !enabled.edit;
 }
 
 /* ライブリージョンへ辞書メッセージ */
