@@ -31,11 +31,11 @@
 },
 "buttons": {
 "start": {
-"normal": "スタート",
+"normal": "スタート(Spaceキー)",
 "hiragana": "すたあと"
 },
 "stop": {
-"normal": "ストップ",
+"normal": "ストップ(Spaceキー)",
 "hiragana": "すとっぷ"
 },
 "reset": {

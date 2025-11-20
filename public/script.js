@@ -16,6 +16,7 @@ const state = {
   mOnes: 0,
   sTens: 0,
   sOnes: 0,
+  startMs: 0, // スタート時の時間（ミリ秒）
   totalMs: 0, // 残り時間（ミリ秒）
   endAt: 0, // エンドタイムスタンプ（基準時刻差分方式）
   timerId: 0, // setInterval ID
@@ -250,6 +251,13 @@ function bindEvents() {
     resetAll();
   });
 
+  // スペースキーでスタート／ストップボタンクリック
+  document.addEventListener('keydown', (e) => {
+    if(e.code === 'Space') {
+      e.preventDefault();
+      els['btn-startstop'].click();
+    }
+  });
   // ウィンドウ離脱時に念のためタイマ停止（ブラウザ節電）
   window.addEventListener('visibilitychange', () => {
     if (document.hidden && state.status === 'S1') {
@@ -457,6 +465,7 @@ function enterCounting(totalSeconds) {
 
   // 精度保証：基準時刻差分方式
   const now = performance.now();
+  state.startMs = totalSeconds * 1000;
   state.totalMs = totalSeconds * 1000;
   state.endAt = now + state.totalMs;
 
@@ -508,6 +517,7 @@ function onTick() {
     updateButtonsEnabled();
     speak('messages.finished');
     playFinishBeep();
+    applyRemainingMs(state.startMs);
   }
 }
 
